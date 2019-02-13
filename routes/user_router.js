@@ -3,14 +3,10 @@ var router = express.Router();
 const UserService = require("../services/user_service");
 
 const userService = new UserService();
-/* GET home page. */
+
 router.get("/", async function (req, res, next) {
-  const { tags } = req.query;
-
-  console.log("req", req.query);
-
   try {
-    const users = await userService.getUsers({ tags });
+    const users = await userService.getUsers();
 
     res.status(200).json({
       data: users,
@@ -21,20 +17,34 @@ router.get("/", async function (req, res, next) {
   }
 });
 
-router.post("/", async function(req, res, next) {
-  const { body: user } = req;
-
-  console.log("req", req.body);
+router.get("/:username", async function (req, res, next) {
+  const { username } = req.params;
 
   try {
-    const createdUser = await userService.createUser({ user });
+    const user = await userService.getUserByUsername({ username });
+    res.status(200).json({
+      data: user,
+      message: "user found"
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post("/", async function(req, res, next) {
+  const { body: newUser } = req;
+
+  try {
+    const createdUser = await userService.createUser({ newUser });
 
     res.status(201).json({
       data: createdUser,
       message: "user created"
     });
   } catch (err) {
-    next(err);
+    res.status(err.code).json({
+      message: err.message
+    });
   }
 });
 

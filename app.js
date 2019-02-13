@@ -2,6 +2,12 @@ const express = require("express");
 const bodyParser = require('body-parser');
 const userRouter = require('./routes/user_router');
 
+const { 
+  logErrors,
+  clientErrorHandler,
+  errorHandler
+} = require('./utils/middlewares/errorsHandlers');
+
 // app
 const app = express();
 
@@ -15,6 +21,11 @@ app.use("/user", userRouter);
 app.get('/', function (req, res) {
   res.redirect('/user');
 });
+
+// error handlers
+app.use(logErrors);
+app.use(clientErrorHandler);
+app.use(errorHandler);
 
 // server
 const server = app.listen(8000, function () {
